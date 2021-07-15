@@ -13,7 +13,7 @@ class Arduino:
         self.thread = None
         self.data_queue = queue.Queue()
 
-        self.port = 'COM6' if os.name == 'nt' else '/dev/ttyACM0'
+        self.port = 'COM9' if os.name == 'nt' else '/dev/ttyACM0'
         self.baudrate = 115200
         self.timeout = 0.5
         self.serial = serial.Serial(self.port, self.baudrate, timeout=self.timeout)#, dsrdtr=True)
@@ -68,9 +68,9 @@ class Arduino:
         if self.serial.is_open():
             self.serial.close()
             
-    def save(self, n=-1, fname=None):
-        if fname is None:
-            fname = f'arduino{n}.csv'
+    def save(self, n=-1, path='./', fname='arduino.csv'):
+        if fname[-4:] != '.csv':
+            fname += '.csv'            
         with open(fname, 'w', newline='') as f:
             writer = csv.writer(f)
             writer.writerow(self.columns)
