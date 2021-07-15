@@ -10,6 +10,7 @@ class Arduino:
         self.start_time = None
         self.is_running = False
         self.thread = None
+        self.data_queue = queue.Queue()
 
         self.port = 'COM6' if os.name == 'nt' else '/dev/ttyACM0'
         self.baudrate = 115200
@@ -32,10 +33,16 @@ class Arduino:
             data = None
         return data
     
+    def __save(self, data):
+        self.raw[-1].append(data)
+        self.data_queue.put(data)
+    
     def start(self):
+        self.raw.append([])
         self.serial.write(b'1')
         self.is_running = True
         t, *v = self.receive()
+        self.__save([t, *v])
         self.start_time = int(t)
         self.thread = Thread(target=self.run, daemon=True)
         self.thread.start()
@@ -43,7 +50,7 @@ class Arduino:
     def run(self):
         while self.is_running:
             data = self.receive()
-            self.raw.append(data)
+            self.__save(data)
 
     def stop(self):
         self.is_running = False
