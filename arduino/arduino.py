@@ -52,7 +52,8 @@ class Arduino:
     def run(self):
         while self.is_running:
             data = self.receive()
-            self.__record(data)
+            if not data is None:
+                self.__record(data)
 
     def stop(self):
         self.is_running = False
