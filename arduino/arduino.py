@@ -84,5 +84,6 @@ class Arduino:
                 writer = csv.writer(f)
                 writer.writerow(self.columns)
                 writer.writerows(self.raw[n])
-        except:
+        except Exception as e:
+            print(e)
             return False
