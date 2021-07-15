@@ -1,4 +1,5 @@
 import os
+import csv
 import serial
 import queue
 from threading import Thread
@@ -42,6 +43,7 @@ class Arduino:
         self.serial.write(b'1')
         self.is_running = True
         t, *v = self.receive()
+        self.columns = ['time', *[f'data{n}' for n in range(len(v))]]
         self.__record([t, *v])
         self.start_time = int(t)
         self.thread = Thread(target=self.run, daemon=True)
@@ -64,3 +66,11 @@ class Arduino:
     def close(self):
         if self.serial.is_open():
             self.serial.close()
+            
+    def save(self, n=-1, fname=None):
+        if fname is None:
+            fname = f'arduino{n}.csv'
+        with open(fname, 'w') as f:
+            writer = csv.writer()
+            writer.writerow(self.columns)
+            writer.writerows(self.raw[-1])
