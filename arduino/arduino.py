@@ -77,9 +77,12 @@ class Arduino:
             self.serial.close()
             
     def save(self, n=-1, path='./', fname='arduino.csv'):
-        if fname[-4:] != '.csv':
-            fname += '.csv'            
-        with open(fname, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerow(self.columns)
-            writer.writerows(self.raw[-1])
+        try:
+            if fname[-4:] != '.csv':
+                fname += '.csv'            
+            with open(path+fname, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(self.columns)
+                writer.writerows(self.raw[n])
+        except:
+            return False
