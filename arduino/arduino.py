@@ -70,7 +70,7 @@ class Arduino:
     def save(self, n=-1, fname=None):
         if fname is None:
             fname = f'arduino{n}.csv'
-        with open(fname, 'w') as f:
-            writer = csv.writer()
+        with open(fname, 'w', newline='') as f:
+            writer = csv.writer(f)
             writer.writerow(self.columns)
             writer.writerows(self.raw[-1])
