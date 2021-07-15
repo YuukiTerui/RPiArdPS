@@ -33,7 +33,7 @@ class Arduino:
             data = None
         return data
     
-    def __save(self, data):
+    def __record(self, data):
         self.raw[-1].append(data)
         self.data_queue.put(data)
     
@@ -42,7 +42,7 @@ class Arduino:
         self.serial.write(b'1')
         self.is_running = True
         t, *v = self.receive()
-        self.__save([t, *v])
+        self.__record([t, *v])
         self.start_time = int(t)
         self.thread = Thread(target=self.run, daemon=True)
         self.thread.start()
@@ -50,7 +50,7 @@ class Arduino:
     def run(self):
         while self.is_running:
             data = self.receive()
-            self.__save(data)
+            self.__record(data)
 
     def stop(self):
         self.is_running = False
