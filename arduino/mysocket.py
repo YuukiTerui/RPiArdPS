@@ -76,14 +76,13 @@ def client_process(host, port):
     HOST = host
     PORT = port
     s = MySocket()
-    while True:
-        try:
-            s.connect(HOST, PORT)
-            msg = input('< ')
-            s.send(msg)
-        except KeyboardInterrupt as e:
-            print('Ctrl- is pressed')
-            break
+    try:
+        s.connect(HOST, PORT)
+        #msg = input('< ')
+        msg = list(range(10))
+        s.send(msg)
+    except KeyboardInterrupt as e:
+        print('Ctrl- is pressed')
     
 def main():
     import sys
