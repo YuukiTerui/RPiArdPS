@@ -77,9 +77,9 @@ def client_process(host, port):
     HOST = host
     PORT = port
     s = MySocket()
+    s.connect(HOST, PORT)
     while True:
         try:
-            s.connect(HOST, PORT)
             msg = input('< ')
             s.send(msg)
         except KeyboardInterrupt as e:
