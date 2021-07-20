@@ -11,6 +11,7 @@ class MySocket:
         else:
             self.sock = sock
         #self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        self.clients = []
         self.is_running = False
         
     def init_server(self, host, port, bind=5):
