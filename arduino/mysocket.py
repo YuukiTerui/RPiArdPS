@@ -1,3 +1,4 @@
+import configparser
 import time
 import socket
 import pickle
@@ -52,9 +53,9 @@ class MySocket:
     
     
     
-def server_process():
-    HOST = socket.gethostbyname(socket.gethostname())
-    PORT = 12345
+def server_process(host, port):
+    HOST = host
+    PORT = port
     s = MySocket()
     s.init_server(HOST, PORT)
     while True:
@@ -69,9 +70,9 @@ def server_process():
             client.close()
             break
         
-def client_process():
-    HOST = socket.gethostbyname(socket.gethostname())
-    PORT = 12345
+def client_process(host, port):
+    HOST = host
+    PORT = port
     s = MySocket()
     while True:
         try:
@@ -84,10 +85,16 @@ def client_process():
     
 def main():
     import sys
+    conf = ConfigParser()
+    conf.read('./config/connection.conf')
+    sock_info = input(conf.sections())
+    host = conf[sock_info]['ip']
+    port = int(conf[sock_info]['port'])
+    print(host, port)
     if sys.argv[1] == 's':
-        server_process()
+        server_process(host, port)
     elif sys.argv[1] == 'c':
-        client_process()
+        client_process(host, port)
     
     
 if __name__ == '__main__':
