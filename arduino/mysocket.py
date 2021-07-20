@@ -19,6 +19,7 @@ class MySocket:
         
     def accept(self):
         client, address = self.sock.accept()
+        self.clients.append((client, address))
         return client, address
 
     def connect(self, host, port):
@@ -37,11 +38,12 @@ class MySocket:
         except socket.error as e:
             return False
         
-    def receive(self):
+    def receive(self, n=-1):
+        client = self.clients[n][0]
         data = b''
         try:
             while True:
-                tmp, address = self.sock.recv(2**12)
+                tmp, address = self.client.recv(2**12)
                 if len(tmp) <=0:
                     break
                 data += tmp
