@@ -44,7 +44,7 @@ class MySocket:
         data = b''
         try:
             while True:
-                tmp, address = client.recv(2**12)
+                tmp = client.recv(2**12)
                 if len(tmp) <=0:
                     break
                 data += tmp
