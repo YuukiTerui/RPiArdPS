@@ -55,7 +55,6 @@ class MySocket:
             return data
     
     
-    
 def server_process(host, port):
     HOST = host
     PORT = port
@@ -68,18 +67,18 @@ def server_process(host, port):
             print(f'Connect to {address}')
             msg = s.receive()
             print(f'> {msg}  (from {address})')
+            client.close()
         except KeyboardInterrupt as e:
             print('Ctrl-C is pressed')
-            client.close()
             break
         
 def client_process(host, port):
     HOST = host
     PORT = port
     s = MySocket()
-    s.connect(HOST, PORT)
     while True:
         try:
+            s.connect(HOST, PORT)
             msg = input('< ')
             s.send(msg)
         except KeyboardInterrupt as e:
