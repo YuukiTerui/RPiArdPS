@@ -123,6 +123,7 @@ class ArdApp(tk.Tk):
             data_len_val['text'] = len(data)
             data_ave_val['text'] = np.mean(data, axis=0)[1]
             data_std_val['text'] = np.std(data, axis=0)[1]
+            val_list.delete(0, END)
             for i, d in enumerate(data):
                 val_list.insert(END, f'{i:10},{d[0]:10},{d[1]:5}')
             return True
