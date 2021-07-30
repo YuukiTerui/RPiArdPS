@@ -17,7 +17,8 @@ class Arduino:
         self.port = 'COM6' if os.name == 'nt' else '/dev/ttyACM0'
         self.baudrate = 115200
         self.timeout = 0.5
-        self.ser = self.init_serial(self.port, self.baudrate, self.timeout)#, dsrdtr=True)
+        self.ser = None
+        self.init_serial(self.port, self.baudrate, self.timeout)#, dsrdtr=True)
         if self.ser:
             self.__init_ready()
     
