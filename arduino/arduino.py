@@ -48,16 +48,18 @@ class Arduino:
         self.columns = ['time', *[f'data{n}' for n in range(len(v))]]
         self.__record([t, *v])
         self.start_time = int(t)
-        self.thread = Thread(target=self.run, daemon=True)
-        if isinstance(runtime, int):
-            Timer(runtime, self.stop).start()
+        self.thread = Thread(target=self.run, args=(runtime, ), daemon=True)
         self.thread.start()
         return True
 
-    def run(self):
+    def run(self, runtime=None):
         while self.is_running:
             data = self.receive()
             if not data is None:
+                if data[0] > runtime * 1000: # ms
+                    # TODO 以下2行の処理はself.stopと被る部分があるからどーにかする
+                    self.is_running = False
+                    self.serial.write(b'0')
                 self.__record(data)
 
     def stop(self):
