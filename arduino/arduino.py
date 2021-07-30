@@ -1,8 +1,9 @@
 import os
 import csv
 import serial
+from serial.tools import list_ports
 import queue
-from threading import Thread, Timer
+from threading import Thread
 
 
 class Arduino:
@@ -13,20 +14,34 @@ class Arduino:
         self.thread = None
         self.data_queue = queue.Queue()
 
-        self.port = 'COM9' if os.name == 'nt' else '/dev/ttyACM0'
+        self.port = 'COM6' if os.name == 'nt' else '/dev/ttyACM0'
         self.baudrate = 115200
         self.timeout = 0.5
-        self.serial = serial.Serial(self.port, self.baudrate, timeout=self.timeout)#, dsrdtr=True)
-        self.__init_ready()
+        self.ser = self.init_serial(self.port, self.baudrate, self.timeout)#, dsrdtr=True)
+        if self.ser:
+            self.__init_ready()
+    
+    def init_serial(self, port=None, baudrate=None, timeout=None):
+        if port is None:
+            port = self.port
+        if baudrate is None:
+            baudrate = self.baudrate
+        if timeout is None:
+            timeout = self.timeout
+        try:
+            self.ser = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+        except Exception as e:
+            print(e, 'no arduino')
+            self.ser = None
     
     def __init_ready(self):
         while True:
-            msg = self.serial.readline()
+            msg = self.ser.readline()
             if msg == b'arduino is avairable\n':
                 break
     
     def receive(self):
-        data = self.serial.readline()
+        data = self.ser.readline()
         try:
             data = data.decode('utf-8').replace('\n', '').split(',')
             data = list(map(int, data))
@@ -42,7 +57,7 @@ class Arduino:
         if self.is_running:
             return False
         self.raw.append([])
-        self.serial.write(b'1')
+        self.ser.write(b'1')
         self.is_running = True
         t, *v = self.receive()
         self.columns = ['time', *[f'data{n}' for n in range(len(v))]]
@@ -59,24 +74,24 @@ class Arduino:
                 if data[0] > runtime * 1000: # ms
                     # TODO 以下2行の処理はself.stopと被る部分があるからどーにかする
                     self.is_running = False
-                    self.serial.write(b'0')
+                    self.ser.write(b'0')
                 self.__record(data)
 
     def stop(self):
         if self.is_running:
             self.is_running = False
-            self.serial.write(b'0')
+            self.ser.write(b'0')
             self.thread.join()
             return True
         return False
     
     def open(self):
-        if not self.serial.is_open:
-            self.serial.open()
+        if not self.ser.is_open:
+            self.ser.open()
     
     def close(self):
-        if self.serial.is_open:
-            self.serial.close()
+        if self.ser.is_open:
+            self.ser.close()
             
     def save(self, n=-1, path='./', fname='arduino.csv'):
         try:
@@ -89,3 +104,10 @@ class Arduino:
         except Exception as e:
             print(e)
             return False
+    
+    @staticmethod
+    def get_comports():
+        ports = []
+        for cp in list_ports.comports():
+            ports.append(cp.description)
+        return ports
