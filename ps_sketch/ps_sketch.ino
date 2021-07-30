@@ -4,10 +4,37 @@
 unsigned long start_time = 0;
 unsigned long tmp_time = 0;
 unsigned long prev_time = 0;
-int helz = 50;
+unsigned long rec_time = 0;
+int helz = 100;
 int T = 1000 / helz;
 int data = 0;
 bool send_flag = false;
+
+void(* resetFunc) (void) = 0;
+
+void send_data() {
+  data = analogRead(INPUT_PIN);
+  String s = String(rec_time-start_time);
+  s += ",";
+  s += String(data);
+  s += '\n';
+  Serial.print(s);
+}
+
+void test_mode() {
+  String s = "0, 1023, ";
+  s += String(analogRead(INPUT_PIN));
+  Serial.println(s);
+}
+/*
+int funcnum = 0;
+typedef void (*processFunc)(void);
+processFunc FuncList[] = 
+{
+  &send_data,
+  &test_mode
+};
+*/
 
 void setup() {
   pinMode(LED_PIN, OUTPUT);
@@ -16,22 +43,13 @@ void setup() {
   Serial.print("arduino is avairable\n");
 }
 
-void send_data(unsigned long t) {
-  data = analogRead(INPUT_PIN);
-  String s = String(t-start_time);
-  s += ",";
-  s += String(data);
-  s += '\n';
-  Serial.print(s);
-}
-
-void(* resetFunc) (void) = 0;
-
 void loop() {
   tmp_time = millis();
-  if (tmp_time - prev_time >= T) {
+  rec_time = tmp_time - prev_time;
+  if (rec_time >= T) {
     if (send_flag) {
-      send_data(tmp_time);
+      //(void)(*FuncList[funcnum])();
+      test_mode();
     }
     prev_time = tmp_time;
   }
@@ -46,9 +64,17 @@ void serialEvent() {
         digitalWrite(LED_PIN, LOW);
         break;
       case byte('1'):
+        //funcnum = 0;
         send_flag = true;
         start_time = millis();
         digitalWrite(LED_PIN, HIGH);
+        break;
+      case byte('2'): // test mode
+        //funcnum = 1;
+        send_flag = true;
+        start_time = millis();
+        digitalWrite(LED_PIN, HIGH);
+        
         break;
       // default:
       case byte('9'):
