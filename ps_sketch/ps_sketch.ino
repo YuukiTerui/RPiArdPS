@@ -10,11 +10,11 @@ int T = 1000 / helz;
 int data = 0;
 bool send_flag = false;
 
-void(* resetFunc) (void) = 0;
+
 
 void send_data() {
   data = analogRead(INPUT_PIN);
-  String s = String(rec_time-start_time);
+  String s = String(tmp_time-start_time);
   s += ",";
   s += String(data);
   s += '\n';
@@ -43,13 +43,16 @@ void setup() {
   Serial.print("arduino is avairable\n");
 }
 
+void(* resetFunc) (void) = 0;
+
 void loop() {
   tmp_time = millis();
   rec_time = tmp_time - prev_time;
   if (rec_time >= T) {
     if (send_flag) {
       //(void)(*FuncList[funcnum])();
-      test_mode();
+      //test_mode();
+      send_data();
     }
     prev_time = tmp_time;
   }
@@ -74,7 +77,6 @@ void serialEvent() {
         send_flag = true;
         start_time = millis();
         digitalWrite(LED_PIN, HIGH);
-        
         break;
       // default:
       case byte('9'):
