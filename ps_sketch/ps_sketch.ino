@@ -46,6 +46,7 @@ void setup() {
 void(* resetFunc) (void) = 0;
 
 void loop() {
+  serialEvent(); // Arduino nano every needs this line.
   tmp_time = millis();
   rec_time = tmp_time - prev_time;
   if (rec_time >= T) {
